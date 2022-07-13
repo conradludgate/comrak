@@ -259,6 +259,15 @@ pub enum ListDelimType {
     Paren,
 }
 
+impl ListDelimType {
+    pub(crate) fn xml_name(&self) -> &'static str {
+        match *self {
+            ListDelimType::Period => "period",
+            ListDelimType::Paren => "paren",
+        }
+    }
+}
+
 impl Default for ListDelimType {
     fn default() -> ListDelimType {
         ListDelimType::Period
@@ -370,6 +379,42 @@ impl NodeValue {
             NodeValue::Paragraph | NodeValue::Heading(..) | NodeValue::CodeBlock(..)
         )
     }
+
+    pub(crate) fn xml_node_name(&self) -> &'static str {
+        match *self {
+            NodeValue::Document => "document",
+            NodeValue::BlockQuote => "block_quote",
+            NodeValue::FootnoteDefinition(_) => "footnote_definition",
+            NodeValue::List(..) => "list",
+            NodeValue::DescriptionList => "description_list",
+            NodeValue::DescriptionItem(_) => "description_item",
+            NodeValue::DescriptionTerm => "description_term",
+            NodeValue::DescriptionDetails => "description_details",
+            NodeValue::Item(..) => "item",
+            NodeValue::CodeBlock(..) => "code_block",
+            NodeValue::HtmlBlock(..) => "html_block",
+            NodeValue::Paragraph => "paragraph",
+            NodeValue::Heading(..) => "heading",
+            NodeValue::ThematicBreak => "thematic_break",
+            NodeValue::Table(..) => "table",
+            NodeValue::TableRow(..) => "table_row",
+            NodeValue::TableCell => "table_cell",
+            NodeValue::Text(..) => "text",
+            NodeValue::SoftBreak => "softbreak",
+            NodeValue::LineBreak => "linebreak",
+            NodeValue::Image(..) => "image",
+            NodeValue::Link(..) => "link",
+            NodeValue::Emph => "emph",
+            NodeValue::Strong => "strong",
+            NodeValue::Code(..) => "code",
+            NodeValue::HtmlInline(..) => "html_inline",
+            NodeValue::Strikethrough => "strikethrough",
+            NodeValue::FrontMatter(_) => "frontmatter",
+            NodeValue::TaskItem(_) => "tasklist",
+            NodeValue::Superscript => "superscript",
+            NodeValue::FootnoteReference(_) => "footnote_reference",
+        }
+    }
 }
 
 /// A single node in the CommonMark AST.
@@ -383,6 +428,12 @@ pub struct Ast {
 
     /// The line in the input document the node starts at.
     pub start_line: u32,
+    /// The column in the input document the node starts at.
+    pub start_column: u32,
+    /// The line in the input document the node ends at.
+    pub end_line: u32,
+    /// The column in the input document the node ends at.
+    pub end_column: u32,
 
     pub(crate) content: Vec<u8>,
     pub(crate) open: bool,
@@ -396,6 +447,9 @@ impl Ast {
             value,
             content: vec![],
             start_line: 0,
+            start_column: 0,
+            end_line: 0,
+            end_column: 0,
             open: true,
             last_line_blank: false,
         }

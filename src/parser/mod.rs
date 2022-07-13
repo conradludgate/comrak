@@ -96,6 +96,9 @@ pub fn parse_document_with_broken_link_callback<'a, 'c>(
         value: NodeValue::Document,
         content: vec![],
         start_line: 0,
+        start_column: 0,
+        end_line: 0,
+        end_column: 0,
         open: true,
         last_line_blank: false,
     })));
@@ -482,6 +485,9 @@ pub struct ComrakRenderOptions {
     ///            "* one\n* two\n* three\n");
     /// ```
     pub list_style: ListStyleType,
+
+    /// XXX TODO
+    pub sourcepos: bool,
 }
 
 #[derive(Default, Debug)]
