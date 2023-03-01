@@ -83,7 +83,7 @@ extern crate once_cell;
 extern crate propfuzz;
 extern crate regex;
 #[cfg(feature = "syntect")]
-extern crate syntect;
+pub extern crate syntect;
 #[cfg(feature = "benchmarks")]
 extern crate test;
 extern crate typed_arena;
