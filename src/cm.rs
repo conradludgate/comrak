@@ -412,6 +412,8 @@ impl<'a, 'o> CommonMarkFormatter<'a, 'o> {
             self.cr();
             write!(self, "<!-- end list -->").unwrap();
             self.blankline();
+        } else if !entering {
+            self.blankline();
         }
     }
 
@@ -505,19 +507,19 @@ impl<'a, 'o> CommonMarkFormatter<'a, 'o> {
             let info = ncb.info.as_bytes();
             let literal = ncb.literal.as_bytes();
 
-            if info.is_empty()
-                && (literal.len() > 2
-                    && !isspace(literal[0])
-                    && !(isspace(literal[literal.len() - 1])
-                        && isspace(literal[literal.len() - 2])))
-                && !first_in_list_item
-            {
-                write!(self, "    ").unwrap();
-                write!(self.prefix, "    ").unwrap();
-                self.write_all(literal).unwrap();
-                let new_len = self.prefix.len() - 4;
-                self.prefix.truncate(new_len);
-            } else {
+            // if info.is_empty()
+            //     && (literal.len() > 2
+            //         && !isspace(literal[0])
+            //         && !(isspace(literal[literal.len() - 1])
+            //             && isspace(literal[literal.len() - 2])))
+            //     && !first_in_list_item
+            // {
+            //     write!(self, "    ").unwrap();
+            //     write!(self.prefix, "    ").unwrap();
+            //     self.write_all(literal).unwrap();
+            //     let new_len = self.prefix.len() - 4;
+            //     self.prefix.truncate(new_len);
+            // } else {
                 let fence_char = if info.contains(&b'`') { b'~' } else { b'`' };
                 let numticks = max(3, longest_char_sequence(literal, fence_char) + 1);
                 for _ in 0..numticks {
@@ -533,7 +535,7 @@ impl<'a, 'o> CommonMarkFormatter<'a, 'o> {
                 for _ in 0..numticks {
                     write!(self, "{}", fence_char as char).unwrap();
                 }
-            }
+            // }
             self.blankline();
         }
     }
@@ -598,10 +600,12 @@ impl<'a, 'o> CommonMarkFormatter<'a, 'o> {
             let all_space = literal
                 .iter()
                 .all(|&c| c == b' ' || c == b'\r' || c == b'\n');
-            let has_edge_space = literal[0] == b' ' || literal[literal.len() - 1] == b' ';
-            let has_edge_backtick = literal[0] == b'`' || literal[literal.len() - 1] == b'`';
+            let has_edge_space =
+                literal.is_empty() || literal[0] == b' ' || literal[literal.len() - 1] == b' ';
+            let has_edge_backtick =
+                literal.is_empty() || literal[0] == b'`' || literal[literal.len() - 1] == b'`';
 
-            let pad = literal.is_empty() || has_edge_backtick || (!all_space && has_edge_space);
+            let pad = has_edge_backtick || (!all_space && has_edge_space);
             if pad {
                 write!(self, " ").unwrap();
             }
